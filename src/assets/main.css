@@ -1,0 +1,31 @@
+﻿:root {
+  --primary-color: #2563eb;
+  --app-font: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--app-font);
+  background-color: #f8fafc;
+  color: #1e293b;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  transition: font-family 0.2s ease;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
