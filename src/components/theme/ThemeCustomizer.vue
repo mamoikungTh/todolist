@@ -27,7 +27,7 @@ const fontPresets = [
   { name: 'Prompt (โมเดิร์น)', value: "'Prompt', sans-serif" },
   { name: 'Kanit (ยอดนิยม)', value: "'Kanit', sans-serif" },
   { name: 'Chakra Petch (ดิจิทัล)', value: "'Chakra Petch', sans-serif" },
-  { name: 'Monospace (โปรแกรมเมอร์)', value: "'Courier New', monospace" }
+  { name: 'Monospace (โปรแกรมเมอร์)', value: "'Courier New', 'Sarabun', monospace" }
 ]
 
 function validColor(color) { return /^#[0-9a-f]{6}$/i.test(color) }

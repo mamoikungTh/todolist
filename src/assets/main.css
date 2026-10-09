@@ -11,7 +11,7 @@
 }
 
 body {
-  font-family: var(--app-font);
+  font-family: var(--app-font), 'Sarabun', sans-serif;
   background-color: #f8fafc;
   color: #1e293b;
   min-height: 100vh;
