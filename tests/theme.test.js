@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import ThemeCustomizer from '../src/components/theme/ThemeCustomizer.vue'
 
 const style = () => document.documentElement.style
@@ -12,6 +13,7 @@ describe('Student 3: theme and fonts', () => {
     expect(localStorage.getItem('student3_theme_color')).toBe('#7c3aed')
     panel.unmount()
     const restored = mount(ThemeCustomizer)
+    await nextTick()
     expect(restored.get('[aria-label="ม่วง (Purple)"]').attributes('aria-pressed')).toBe('true')
   })
   it('changes and persists the selected font', async () => {
@@ -20,6 +22,7 @@ describe('Student 3: theme and fonts', () => {
     expect(style().getPropertyValue('--app-font')).toBe("'Prompt', sans-serif")
     panel.unmount()
     const restored = mount(ThemeCustomizer)
+    await nextTick()
     expect(restored.findAll('.font-btn')[1].attributes('aria-pressed')).toBe('true')
   })
   it('persists the Hello World font size and restores all defaults', async () => {
@@ -29,6 +32,7 @@ describe('Student 3: theme and fonts', () => {
     expect(localStorage.getItem('student3_theme_size')).toBe('40')
     panel.unmount()
     const restored = mount(ThemeCustomizer)
+    await nextTick()
     expect(restored.get('input[type="range"]').element.value).toBe('40')
     await restored.get('.btn-reset').trigger('click')
     expect(style().getPropertyValue('--primary-color')).toBe('#2563eb')
@@ -53,6 +57,7 @@ describe('Student 3: theme and fonts', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked') })
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked') })
     const panel = mount(ThemeCustomizer)
+    await nextTick()
     expect(panel.find('[role="alert"]').exists()).toBe(true)
     await panel.get('[aria-label="ม่วง (Purple)"]').trigger('click')
     expect(style().getPropertyValue('--primary-color')).toBe('#7c3aed')
