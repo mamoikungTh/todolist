@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import TodoForm from './components/TodoForm.vue'
 import TodoList from './components/TodoList.vue'
+import TodoToolbar from './components/TodoToolbar.vue'
+import { filterTodos } from './utils/filterTodos'
 import AuthView from './components/auth/AuthView.vue'
 import ThemeCustomizer from './components/theme/ThemeCustomizer.vue'
 import { useTodos } from './composables/useTodos'
@@ -37,6 +39,14 @@ const {
 function clearCompleted() {
   if (confirm('คุณต้องการล้างรายการที่เสร็จแล้วทั้งหมดใช่หรือไม่?')) removeCompleted()
 }
+// Student 4: ค้นหา กรองสถานะ และเรียงลำดับ
+const searchQuery = ref('')
+const filterStatus = ref('all')
+const sortOrder = ref('newest')
+const filteredTodos = computed(() => filterTodos(todos.value, searchQuery.value, filterStatus.value, sortOrder.value))
+const isFiltered = computed(() => Boolean(searchQuery.value.trim()) || filterStatus.value !== 'all')
+function resetFilters() { searchQuery.value = ''; filterStatus.value = 'all'; sortOrder.value = 'newest' }
+watch(todoStorageKey, resetFilters)
 </script>
 
 <template>
@@ -47,7 +57,7 @@ function clearCompleted() {
         <span class="brand-icon">📋</span>
         <div class="brand-text">
           <span class="brand-title">Todo List Project</span>
-          <span class="brand-subtitle">Student 1, Student 2, Student 3</span>
+          <span class="brand-subtitle">Student 1, Student 2, Student 3, Student 4</span>
         </div>
       </div>
 
@@ -97,7 +107,7 @@ function clearCompleted() {
         <!-- 1. แสดง STUDENT 1: Main Todo List -->
         <div v-if="activeTab === 'todo'" class="card main-card">
           <div class="card-top-header">
-            <span class="badge-role badge-s1">Student 1 Assignment</span>
+            <span class="badge-role badge-s1">Student 1 + Student 4</span>
             <h1 class="card-title">Main Todo List</h1>
             <p class="card-subtitle">
               ระบบจัดการรายการงาน (Add, Edit, Delete, View Todo List)
@@ -115,7 +125,7 @@ function clearCompleted() {
               <span class="stat-num total">{{ totalCount }}</span>
             </div>
             <div class="stat-box">
-              <span class="stat-lbl">กำลังทำ</span>
+              <span class="stat-lbl">ยังไม่เสร็จ</span>
               <span class="stat-num pending">{{ pendingCount }}</span>
             </div>
             <div class="stat-box">
@@ -127,9 +137,15 @@ function clearCompleted() {
           <!-- ฟอร์มเพิ่มงาน (Create / Add) -->
           <TodoForm @add="addTodo" />
 
+          <TodoToolbar
+            v-model:query="searchQuery" v-model:status="filterStatus" v-model:sort="sortOrder"
+            :visible-count="filteredTodos.length" :total-count="totalCount" @reset="resetFilters"
+          />
+
           <!-- รายการ Todo (Read / View, Update, Delete) -->
           <TodoList
-            :todos="todos"
+            :todos="filteredTodos"
+            :is-filtered="isFiltered"
             @toggle="toggleTodo"
             @update="updateTodo"
             @remove="removeTodo"
@@ -431,6 +447,7 @@ function clearCompleted() {
     align-items: stretch;
   }
   .nav-tabs {
+    flex-wrap: wrap;
     justify-content: center;
   }
   .user-action-area {
