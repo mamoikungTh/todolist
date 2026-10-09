@@ -1,5 +1,6 @@
-﻿:root {
+:root {
   --primary-color: #2563eb;
+  --primary-contrast: #ffffff;
   --app-font: 'Sarabun', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -29,3 +30,4 @@ body {
 button, input, select, textarea {
   font-family: inherit;
 }
+:focus-visible { outline: 3px solid #6366f1; outline-offset: 3px; }

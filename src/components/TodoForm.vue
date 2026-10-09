@@ -89,7 +89,7 @@ input[type="text"].has-error {
 
 .btn-add {
   background-color: var(--primary-color, #2563eb);
-  color: #ffffff;
+  color: var(--primary-contrast, #ffffff);
 }
 
 .btn-add:hover {

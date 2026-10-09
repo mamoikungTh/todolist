@@ -277,7 +277,7 @@ function clearCompleted() {
 
 .btn-login-nav {
   background-color: var(--primary-color, #2563eb);
-  color: #ffffff;
+  color: var(--primary-contrast, #ffffff);
   border: none;
   padding: 8px 16px;
   border-radius: 8px;

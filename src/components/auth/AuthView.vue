@@ -342,7 +342,7 @@ button:disabled { opacity: .6; cursor: wait; }
 
 .btn-primary {
   background-color: var(--primary-color, #2563eb);
-  color: #ffffff;
+  color: var(--primary-contrast, #ffffff);
 }
 
 .btn-primary:hover {
