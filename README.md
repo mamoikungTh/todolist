@@ -4,11 +4,9 @@
 
 ## เปิดงานที่พัฒนาเสร็จสำหรับตรวจ
 
-ชุดรวมสำหรับทดสอบอยู่ที่ **`feature4.1` ใน Git Bundle ที่ส่งมาพร้อมโปรเจกต์** ส่วน `dev` เป็นฐานสำหรับรับงานหลังผ่าน Manual Test และ Peer Review ตาม Lab 5-3
+ชุดรวมสำหรับทดสอบอยู่ที่ **[`feature4.1`](https://github.com/mamoikungTh/todolist/tree/feature4.1)** บน GitHub แล้ว รวมงานของทั้ง 4 ส่วน พร้อม tests และเอกสาร ส่วน `dev` เป็นฐานสำหรับรับงานหลังผ่าน Manual Test และ Peer Review ตาม Lab 5-3
 
-**ยังไม่ได้ส่ง branch ใหม่ขึ้น GitHub:** GitHub ตอบ `403: Resource not accessible by integration` ตอนสร้าง branch การแก้ไขทั้งหมดอยู่ในไฟล์ที่ส่งให้ ดู [วิธีนำงานขึ้น GitHub](docs/IMPORT-AND-PUSH.md) ก่อนใช้คำสั่ง fetch/clone ด้านล่าง
-
-**หลังนำ branch ขึ้น GitHub แล้ว** หากมี repository เดิมอยู่ ให้เปิด Terminal ในโฟลเดอร์นั้น:
+หากมี repository เดิมอยู่ ให้เปิด Terminal ในโฟลเดอร์นั้น:
 
 ```bash
 git status
@@ -29,7 +27,7 @@ npm.cmd test
 npm.cmd run dev
 ```
 
-สำหรับเครื่องใหม่ **หลังนำ branch ขึ้น GitHub แล้ว**:
+สำหรับเครื่องใหม่ หรือเคยใช้ Git Bundle ชุดก่อนหน้า ให้ clone จาก GitHub ในโฟลเดอร์ใหม่:
 
 ```bash
 git clone --branch feature4.1 https://github.com/mamoikungTh/todolist.git
@@ -84,7 +82,7 @@ npm run preview   # เปิด build เพื่อทดสอบ
 1. อ่าน [ผลทดสอบอัตโนมัติ](docs/TEST-RESULTS.md)
 2. ทำ [Manual Test Checklist](docs/MANUAL-TEST.md) และบันทึกผลจริง พร้อมภาพตามที่อาจารย์ต้องการ
 3. ให้เพื่อนอย่างน้อย 1 คนตรวจโค้ดและบันทึกผู้ตรวจ
-4. เมื่อผ่านแล้ว เปลี่ยน Draft PR เป็น Ready for review และ merge เข้า `dev` โดยเก็บ Feature Branches ไว้เป็นหลักฐาน
+4. เปิด Pull Requests ของ repository ตรวจว่า base เป็น `dev` และ head เป็น `feature4.1`; เมื่อทดสอบผ่านแล้ว เปลี่ยน Draft PR เป็น Ready for review และ merge เข้า `dev` โดยเก็บ Feature Branches ไว้เป็นหลักฐาน
 5. อัปเดต Trello ตามผลจริง แล้วส่งลิงก์ repository ใน Discord ด้วยตัวเอง
 
 อย่าย้ายการ์ดเป็น Done หรือบันทึกว่า Manual Test/Peer Review ผ่าน เพียงเพราะ Unit Test ผ่าน

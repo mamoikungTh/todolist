@@ -1,6 +1,6 @@
 # ผลตรวจของ Codex — Lab 5-3
 
-Code commit: `525ae19` บน `feature4.1` (commit หลังจากนี้อัปเดตเอกสารเท่านั้น)
+Code commit บน GitHub: `ffafe6fcb39b83c6a2b59448a43db68c2ef21716` บน `feature4.1` (commit หลังจากนี้อัปเดตเอกสารเท่านั้น)
 
 ## ผลที่รันจริง
 
@@ -43,6 +43,7 @@ Environment: Node 24.19.0, npm 11.9.0, Vitest 4.1.11, Vite 8.3.4, Playwright ก
 
 - **ผู้เรียนยังต้องทำ Manual Test เอง** ตาม `MANUAL-TEST.md`
 - **Peer Review ยังรอเพื่อนในทีม** ไม่ได้บันทึกว่าผ่านแทนผู้เรียน
-- **GitHub ยังไม่ได้รับ branch/commit ชุดใหม่นี้** เพราะ integration ปฏิเสธสิทธิ์เขียน (403) ไม่มี PR หรือการ merge เกิดขึ้น
-- ใช้ Git Bundle และ `IMPORT-AND-PUSH.md` นำ branch ขึ้น repository เดิม เปิด Draft PR แล้ว merge เข้า `dev` เมื่อผ่านการทดสอบและ review จริง
+- **ส่ง branch/commit ขึ้น GitHub แล้ว**: `dev`, `feature1.1`, `feature2.1`, `feature3.1`, `feature4.1` โดย `main` และ `dev` ยังอยู่ที่โค้ดฐานเดิม
+- ตรวจ Draft PR จาก `feature4.1` ไป `dev` และ merge เมื่อผู้เรียนผ่าน Manual Test กับ Peer Review จริง
+- ตรวจความตรงกันของ source ที่ส่งขึ้น GitHub ด้วย Git tree SHA เทียบกับไฟล์ที่ทดสอบแล้ว ไม่มีการเปลี่ยนโค้ดระหว่างส่งขึ้น GitHub
 - Trello และ Discord ยังไม่ได้อัปเดตจากรอบนี้
