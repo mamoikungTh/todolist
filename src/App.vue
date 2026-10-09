@@ -1,10 +1,10 @@
-﻿<script setup>
-import { ref, computed, onMounted } from 'vue'
+<script setup>
+import { ref, onMounted } from 'vue'
 import TodoForm from './components/TodoForm.vue'
 import TodoList from './components/TodoList.vue'
 import AuthView from './components/auth/AuthView.vue'
 import ThemeCustomizer from './components/theme/ThemeCustomizer.vue'
-import { useLocalStorage } from './composables/useLocalStorage'
+import { useTodos } from './composables/useTodos'
 
 // แท็บที่กำลังแสดง: 'todo' (Student 1) หรือ 'auth' (Student 2)
 const activeTab = ref('todo')
@@ -38,77 +38,13 @@ function handleLogout() {
 // ----------------------------------------------------
 // ข้อมูลและฟังก์ชันของ STUDENT 1 - Main Todo List
 // ----------------------------------------------------
-const defaultTodos = [
-  {
-    id: 101,
-    text: 'Student 1: พัฒนา Add, Edit, Delete, View Todo List',
-    done: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 102,
-    text: 'Student 2: พัฒนาระบบ Login, Register, Forget Password',
-    done: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 103,
-    text: 'Student 3: พัฒนาระบบเปลี่ยนสีและฟอนต์ (Hello World ด้านขวามือ)',
-    done: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-]
+const {
+  todos, storageError, totalCount, completedCount, pendingCount,
+  addTodo, toggleTodo, updateTodo, removeTodo, clearCompleted: removeCompleted
+} = useTodos()
 
-const todos = useLocalStorage('student1-todo-list', defaultTodos)
-
-// สถิติจำนวนงาน
-const totalCount = computed(() => todos.value.length)
-const completedCount = computed(() => todos.value.filter(t => t.done).length)
-const pendingCount = computed(() => todos.value.filter(t => !t.done).length)
-
-// 1. CREATE: เพิ่มงาน
-function addTodo(text) {
-  const now = new Date().toISOString()
-  todos.value.unshift({
-    id: Date.now(),
-    text: text.trim(),
-    done: false,
-    createdAt: now,
-    updatedAt: now
-  })
-}
-
-// 2. UPDATE: สลับสถานะ Done
-function toggleTodo(id) {
-  const todo = todos.value.find(t => t.id === id)
-  if (todo) {
-    todo.done = !todo.done
-    todo.updatedAt = new Date().toISOString()
-  }
-}
-
-// 3. UPDATE: แก้ไขข้อความ
-function updateTodo({ id, text }) {
-  const todo = todos.value.find(t => t.id === id)
-  const cleanText = text.trim()
-  if (!todo || !cleanText) return
-  todo.text = cleanText
-  todo.updatedAt = new Date().toISOString()
-}
-
-// 4. DELETE: ลบงาน
-function removeTodo(id) {
-  todos.value = todos.value.filter(t => t.id !== id)
-}
-
-// ล้างงานที่เสร็จแล้วทั้งหมด
 function clearCompleted() {
-  if (confirm('คุณต้องการล้างรายการที่เสร็จแล้วทั้งหมดใช่หรือไม่?')) {
-    todos.value = todos.value.filter(t => !t.done)
-  }
+  if (confirm('คุณต้องการล้างรายการที่เสร็จแล้วทั้งหมดใช่หรือไม่?')) removeCompleted()
 }
 </script>
 
@@ -175,6 +111,8 @@ function clearCompleted() {
             </p>
           </div>
 
+          <p v-if="storageError" class="storage-warning" role="alert">{{ storageError }}</p>
+
           <!-- สถิติจำนวนงาน -->
           <div class="stats-row">
             <div class="stat-box">
@@ -229,6 +167,7 @@ function clearCompleted() {
 </template>
 
 <style scoped>
+.storage-warning { padding: 12px; margin-bottom: 16px; border-radius: 8px; color: #92400e; background: #fffbeb; }
 .main-layout {
   min-height: 100vh;
   display: flex;

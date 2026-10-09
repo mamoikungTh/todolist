@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, nextTick } from 'vue'
 
 const props = defineProps({
@@ -61,6 +61,7 @@ function cancelEdit() {
           <input
             type="checkbox"
             :checked="todo.done"
+            :aria-label="`สถานะงาน ${todo.text}`"
             @change="emit('toggle', todo.id)"
           />
           <span class="checkmark"></span>
@@ -95,6 +96,7 @@ function cancelEdit() {
         <input
           ref="editInput"
           v-model="draft"
+          aria-label="แก้ไขชื่องาน"
           type="text"
           class="edit-input"
           :class="{ 'has-error': editError }"
@@ -102,7 +104,7 @@ function cancelEdit() {
           @keyup.esc="cancelEdit"
           @input="editError = ''"
         />
-        <p v-if="editError" class="edit-error">{{ editError }}</p>
+        <p v-if="editError" class="edit-error" role="alert">{{ editError }}</p>
       </div>
 
       <div class="action-buttons">
@@ -274,5 +276,10 @@ function cancelEdit() {
   margin: 4px 0 0 2px;
   font-size: 12px;
   color: #ef4444;
+}
+@media (max-width: 480px) {
+  .view-mode, .edit-mode { align-items: stretch; flex-direction: column; }
+  .action-buttons { justify-content: flex-end; }
+  .edit-input-wrapper { min-width: 0; width: 100%; }
 }
 </style>

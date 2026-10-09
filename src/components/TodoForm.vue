@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref } from 'vue'
 
 const emit = defineEmits(['add'])
@@ -29,6 +29,7 @@ function handleInput() {
     <div class="input-group">
       <input
         v-model="text"
+        aria-label="ชื่องานใหม่"
         type="text"
         placeholder="เพิ่มงานใหม่ที่ต้องทำ... (กด Enter เพื่อเพิ่ม)"
         :class="{ 'has-error': error }"
@@ -54,6 +55,7 @@ function handleInput() {
 
 input[type="text"] {
   flex: 1;
+  min-width: 0;
   padding: 12px 16px;
   font-size: 15px;
   border: 2px solid #e2e8f0;
@@ -103,5 +105,8 @@ input[type="text"].has-error {
   font-size: 13px;
   color: #ef4444;
   font-weight: 500;
+}
+@media (max-width: 400px) {
+  .input-group { flex-direction: column; }
 }
 </style>
