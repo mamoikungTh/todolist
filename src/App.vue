@@ -1,39 +1,30 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import TodoForm from './components/TodoForm.vue'
 import TodoList from './components/TodoList.vue'
 import AuthView from './components/auth/AuthView.vue'
 import ThemeCustomizer from './components/theme/ThemeCustomizer.vue'
 import { useTodos } from './composables/useTodos'
+import { readSession, clearSession } from './services/demoAuth'
 
 // แท็บที่กำลังแสดง: 'todo' (Student 1) หรือ 'auth' (Student 2)
 const activeTab = ref('todo')
 
 // ผู้ใช้ที่เข้าสู่ระบบอยู่ในปัจจุบัน (Student 2)
-const currentUser = ref(null)
-
-onMounted(() => {
-  try {
-    const savedUser = localStorage.getItem('current_auth_user')
-    if (savedUser) {
-      currentUser.value = JSON.parse(savedUser)
-    }
-  } catch {
-    // fallback
-  }
-})
-
+const currentUser = ref(readSession())
+const sessionError = ref('')
 function handleLoginSuccess(user) {
   currentUser.value = user
-  localStorage.setItem('current_auth_user', JSON.stringify(user))
-  // แจ้งเตือนสั้นๆ แล้วสลับกลับมาหน้า Todo List
+  sessionError.value = ''
   activeTab.value = 'todo'
 }
-
 function handleLogout() {
+  try { clearSession() } catch (err) { sessionError.value = err.message }
   currentUser.value = null
-  localStorage.removeItem('current_auth_user')
 }
+const todoStorageKey = computed(() => currentUser.value
+  ? `student1-todo-list:${encodeURIComponent(currentUser.value.email.trim().toLowerCase())}`
+  : 'student1-todo-list')
 
 // ----------------------------------------------------
 // ข้อมูลและฟังก์ชันของ STUDENT 1 - Main Todo List
@@ -41,7 +32,7 @@ function handleLogout() {
 const {
   todos, storageError, totalCount, completedCount, pendingCount,
   addTodo, toggleTodo, updateTodo, removeTodo, clearCompleted: removeCompleted
-} = useTodos()
+} = useTodos(todoStorageKey)
 
 function clearCompleted() {
   if (confirm('คุณต้องการล้างรายการที่เสร็จแล้วทั้งหมดใช่หรือไม่?')) removeCompleted()
@@ -97,6 +88,8 @@ function clearCompleted() {
       </div>
     </header>
 
+    <p v-if="sessionError" class="storage-warning" role="alert">{{ sessionError }}</p>
+
     <!-- พื้นที่เนื้อหาหลัก 2 คอลัมน์ (ซ้าย: Todo/Auth, ขวา: Theme Customizer Hello World) -->
     <main class="content-container">
       <!-- คอลัมน์ซ้าย / กลาง (Student 1 หรือ Student 2) -->
@@ -112,6 +105,8 @@ function clearCompleted() {
           </div>
 
           <p v-if="storageError" class="storage-warning" role="alert">{{ storageError }}</p>
+
+          <p class="account-note">{{ currentUser ? `งานของ ${currentUser.name}` : "โหมดผู้เยี่ยมชม · งานเดิมที่บันทึกไว้ในเบราว์เซอร์นี้" }}</p>
 
           <!-- สถิติจำนวนงาน -->
           <div class="stats-row">
@@ -167,6 +162,7 @@ function clearCompleted() {
 </template>
 
 <style scoped>
+.account-note { margin: 0 0 16px; text-align: center; color: #64748b; font-size: 13px; overflow-wrap: anywhere; }
 .storage-warning { padding: 12px; margin-bottom: 16px; border-radius: 8px; color: #92400e; background: #fffbeb; }
 .main-layout {
   min-height: 100vh;
