@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, onMounted, watch } from 'vue'
 
 // ค่าเริ่มต้น
@@ -9,6 +9,7 @@ const defaultFont = "'Sarabun', sans-serif"
 const currentColor = ref(defaultColor)
 const currentFont = ref(defaultFont)
 const fontSize = ref(28) // ขนาดตัวอักษรของ Hello World
+const storageError = ref('')
 
 // รายการสีสำเร็จรูป (Color Presets)
 const colorPresets = [
@@ -26,40 +27,51 @@ const fontPresets = [
   { name: 'Prompt (โมเดิร์น)', value: "'Prompt', sans-serif" },
   { name: 'Kanit (ยอดนิยม)', value: "'Kanit', sans-serif" },
   { name: 'Chakra Petch (ดิจิทัล)', value: "'Chakra Petch', sans-serif" },
-  { name: 'Monospace (โปรแกรมเมอร์)', value: "'Courier New', monospace" }
+  { name: 'Monospace (โปรแกรมเมอร์)', value: "'Courier New', 'Sarabun', monospace" }
 ]
 
-// ฟังก์ชันปรับใช้สีและฟอนต์กับทั้งระบบ
-function applyTheme(color, font) {
-  currentColor.value = color
-  currentFont.value = font
-
-  // ตั้งค่า CSS Variables ให้ทั้งหน้าเว็บ Todo List เปลี่ยนสีและฟอนต์ตาม
-  document.documentElement.style.setProperty('--primary-color', color)
-  document.documentElement.style.setProperty('--app-font', font)
-
-  // บันทึกลง localStorage
-  localStorage.setItem('student3_theme_color', color)
-  localStorage.setItem('student3_theme_font', font)
+function validColor(color) { return /^#[0-9a-f]{6}$/i.test(color) }
+function contrastColor(color) {
+  const values = color.slice(1).match(/.{2}/g).map(value => {
+    const channel = parseInt(value, 16) / 255
+    return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+  })
+  return values[0] * 0.2126 + values[1] * 0.7152 + values[2] * 0.0722 > 0.179 ? '#000000' : '#ffffff'
 }
-
-function selectColor(color) {
-  applyTheme(color, currentFont.value)
+function saveTheme() {
+  try {
+    localStorage.setItem('student3_theme_color', currentColor.value)
+    localStorage.setItem('student3_theme_font', currentFont.value)
+    localStorage.setItem('student3_theme_size', String(fontSize.value))
+    storageError.value = ''
+  } catch { storageError.value = 'ปรับธีมได้ในหน้านี้ แต่บันทึกการตั้งค่าไว้ไม่ได้' }
 }
-
-function selectFont(font) {
-  applyTheme(currentColor.value, font)
+function applyTheme(color, font, persist = true) {
+  currentColor.value = validColor(color) ? color : defaultColor
+  currentFont.value = fontPresets.some(item => item.value === font) ? font : defaultFont
+  document.documentElement.style.setProperty('--primary-color', currentColor.value)
+  document.documentElement.style.setProperty('--primary-contrast', contrastColor(currentColor.value))
+  document.documentElement.style.setProperty('--app-font', currentFont.value)
+  if (persist) saveTheme()
 }
-
+function selectColor(color) { applyTheme(color, currentFont.value) }
+function selectFont(font) { applyTheme(currentColor.value, font) }
 function resetDefault() {
-  applyTheme(defaultColor, defaultFont)
   fontSize.value = 28
+  applyTheme(defaultColor, defaultFont)
 }
-
+watch(fontSize, saveTheme)
 onMounted(() => {
-  const savedColor = localStorage.getItem('student3_theme_color') || defaultColor
-  const savedFont = localStorage.getItem('student3_theme_font') || defaultFont
-  applyTheme(savedColor, savedFont)
+  try {
+    const color = localStorage.getItem('student3_theme_color') || defaultColor
+    const font = localStorage.getItem('student3_theme_font') || defaultFont
+    const size = Number(localStorage.getItem('student3_theme_size') || 28)
+    fontSize.value = Number.isInteger(size) && size >= 18 && size <= 42 ? size : 28
+    applyTheme(color, font, false)
+  } catch {
+    applyTheme(defaultColor, defaultFont, false)
+    storageError.value = 'อ่านการตั้งค่าธีมไม่ได้ กำลังใช้ค่าเริ่มต้น'
+  }
 })
 </script>
 
@@ -70,6 +82,8 @@ onMounted(() => {
       <h2 class="title">ระบบเปลี่ยนสี & ฟอนต์</h2>
       <p class="subtitle">ปรับแต่งสีและรูปแบบตัวอักษรของ Todo List</p>
     </header>
+
+    <p v-if="storageError" class="theme-warning" role="alert">{{ storageError }}</p>
 
     <!-- กล่องแสดงตัวอย่าง Hello World -->
     <div class="hello-world-wrapper">
@@ -99,6 +113,8 @@ onMounted(() => {
           :class="{ active: currentColor === color.value }"
           :style="{ backgroundColor: color.value }"
           :title="color.name"
+          :aria-label="color.name"
+          :aria-pressed="currentColor === color.value"
           @click="selectColor(color.value)"
         >
           <span v-if="currentColor === color.value" class="check-icon">✓</span>
@@ -109,6 +125,7 @@ onMounted(() => {
       <div class="custom-color-row">
         <span class="custom-label">หรือเลือกสีเอง:</span>
         <input
+          aria-label="เลือกสีธีมเอง"
           type="color"
           :value="currentColor"
           @input="selectColor($event.target.value)"
@@ -126,6 +143,7 @@ onMounted(() => {
           :key="font.value"
           class="font-btn"
           :class="{ active: currentFont === font.value }"
+          :aria-pressed="currentFont === font.value"
           :style="{ fontFamily: font.value }"
           @click="selectFont(font.value)"
         >
@@ -145,7 +163,8 @@ onMounted(() => {
         type="range"
         min="18"
         max="42"
-        v-model="fontSize"
+        v-model.number="fontSize"
+        aria-label="ขนาดตัวอักษร Hello World"
         class="size-slider"
       />
     </section>
@@ -159,6 +178,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.theme-warning { font-size: 12px; background: #fffbeb; color: #92400e; padding: 10px; margin-bottom: 12px; border-radius: 8px; }
 .theme-customizer-card {
   background: #ffffff;
   border-radius: 16px;
@@ -336,7 +356,7 @@ onMounted(() => {
 .font-badge {
   font-size: 11px;
   background-color: var(--primary-color, #2563eb);
-  color: #ffffff;
+  color: var(--primary-contrast, #ffffff);
   padding: 2px 8px;
   border-radius: 9999px;
 }

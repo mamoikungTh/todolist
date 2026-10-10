@@ -1,7 +1,8 @@
-﻿<script setup>
+<script setup>
 import TodoItem from './TodoItem.vue'
 
 defineProps({
+  isFiltered: { type: Boolean, default: false },
   todos: {
     type: Array,
     required: true
@@ -27,8 +28,9 @@ const emit = defineEmits(['toggle', 'update', 'remove'])
 
     <div v-else class="empty-state">
       <div class="empty-icon">📝</div>
-      <h3>ยังไม่มีรายการงานใน Todo List</h3>
-      <p>พิมพ์ชื่องานด้านบนแล้วกดปุ่ม "เพิ่มงาน" เพื่อเริ่มต้นใช้งานได้เลย</p>
+      <h3>{{ isFiltered ? "ไม่พบงานที่ตรงกับการค้นหาหรือตัวกรอง" : "ยังไม่มีรายการงานใน Todo List" }}</h3>
+      <p v-if="isFiltered">ลองเปลี่ยนคำค้นหา เลือกสถานะอื่น หรือกดล้างตัวกรอง</p>
+      <p v-else>พิมพ์ชื่องานด้านบนแล้วกดปุ่ม "เพิ่มงาน" เพื่อเริ่มต้นใช้งานได้เลย</p>
     </div>
   </div>
 </template>

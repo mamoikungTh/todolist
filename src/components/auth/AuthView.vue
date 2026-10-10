@@ -1,444 +1,148 @@
-﻿<script setup>
+<script setup>
 import { ref, reactive } from 'vue'
+import { loginAccount, registerAccount, verifyRecovery, resetPassword, saveSession, DEMO_RECOVERY_CODE } from '../../services/demoAuth'
 
-const props = defineProps({
-  currentUser: {
-    type: Object,
-    default: null
-  }
-})
-
+defineProps({ currentUser: { type: Object, default: null } })
 const emit = defineEmits(['login-success', 'logout'])
-
-// โหมดปัจจุบัน: 'login' | 'register' | 'forgot'
 const currentMode = ref('login')
-
-// ฟอร์มเข้าสู่ระบบ (Login)
-const loginForm = reactive({
-  email: '',
-  password: '',
-  rememberMe: false
-})
-const loginError = ref('')
-const loginSuccess = ref('')
-
-// ฟอร์มสมัครสมาชิก (Register)
-const registerForm = reactive({
-  name: '',
-  email: '',
-  password: '',
-  confirmPassword: ''
-})
-const registerError = ref('')
-const registerSuccess = ref('')
-
-// ฟอร์มลืมรหัสผ่าน (Forgot Password)
-const forgotForm = reactive({
-  email: '',
-  newPassword: '',
-  confirmNewPassword: ''
-})
-const forgotStep = ref(1) // 1: กรอกอีเมล, 2: กรอกรหัสใหม่
-const forgotError = ref('')
-const forgotSuccess = ref('')
-
-// รหัสผ่านเปิด/ปิดตา (Show/Hide Password)
+const busy = ref(false)
 const showPassword = ref(false)
+const error = ref('')
+const success = ref('')
+const recoveryCode = ref('')
+const pendingLogin = ref(null)
+const loginForm = reactive({ email: '', password: '', rememberMe: false })
+const registerForm = reactive({ name: '', email: '', password: '', confirmPassword: '' })
+const forgotForm = reactive({ email: '', code: '', newPassword: '', confirmNewPassword: '' })
+const forgotStep = ref(1)
 
-// รายชื่อผู้ใช้จำลอง (โหลดจาก localStorage ถ้ามี)
-function getRegisteredUsers() {
-  try {
-    const saved = localStorage.getItem('registered_users')
-    if (saved) return JSON.parse(saved)
-  } catch {
-    // fallback
-  }
-  return [
-    { name: 'นักศึกษา สมชาย', email: 'student@example.com', password: 'password123' },
-    { name: 'อาจารย์ผู้สอน', email: 'teacher@example.com', password: 'password123' }
-  ]
+async function run(action) {
+  if (busy.value) return
+  busy.value = true
+  error.value = ''
+  success.value = ''
+  try { await action() } catch (err) { error.value = err.message }
+  finally { busy.value = false }
 }
-
-function saveRegisteredUsers(users) {
-  localStorage.setItem('registered_users', JSON.stringify(users))
-}
-
-// 1. จัดการ Login
-function handleLogin() {
-  loginError.value = ''
-  loginSuccess.value = ''
-
-  if (!loginForm.email || !loginForm.password) {
-    loginError.value = 'กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน'
-    return
-  }
-
-  const users = getRegisteredUsers()
-  const user = users.find(u => u.email.toLowerCase() === loginForm.email.toLowerCase())
-
-  if (!user || user.password !== loginForm.password) {
-    loginError.value = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง'
-    return
-  }
-
-  loginSuccess.value = `ยินดีต้อนรับคุณ ${user.name} เข้าสู่ระบบสำเร็จ!`
-  setTimeout(() => {
-    emit('login-success', { name: user.name, email: user.email })
-    loginSuccess.value = ''
-  }, 600)
-}
-
-// กรอกข้อมูลทดสอบด่วน (Demo)
-function fillDemoAccount() {
-  loginForm.email = 'student@example.com'
-  loginForm.password = 'password123'
-  loginError.value = ''
-}
-
-// 2. จัดการ Register
-function handleRegister() {
-  registerError.value = ''
-  registerSuccess.value = ''
-
-  if (!registerForm.name.trim()) {
-    registerError.value = 'กรุณากรอกชื่อ-นามสกุล'
-    return
-  }
-  if (!registerForm.email.trim() || !registerForm.email.includes('@')) {
-    registerError.value = 'กรุณากรอกอีเมลให้ถูกต้อง'
-    return
-  }
-  if (registerForm.password.length < 6) {
-    registerError.value = 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร'
-    return
-  }
-  if (registerForm.password !== registerForm.confirmPassword) {
-    registerError.value = 'รหัสผ่านทั้งสองช่องไม่ตรงกัน'
-    return
-  }
-
-  const users = getRegisteredUsers()
-  if (users.some(u => u.email.toLowerCase() === registerForm.email.toLowerCase())) {
-    registerError.value = 'อีเมลนี้ถูกใช้งานไปแล้ว กรุณาใช้อีเมลอื่น'
-    return
-  }
-
-  const newUser = {
-    name: registerForm.name.trim(),
-    email: registerForm.email.trim(),
-    password: registerForm.password
-  }
-
-  users.push(newUser)
-  saveRegisteredUsers(users)
-
-  registerSuccess.value = 'สมัครสมาชิกสำเร็จเรียบร้อยแล้ว! กำลังนำคุณไปยังหน้าเข้าสู่ระบบ...'
-  setTimeout(() => {
-    loginForm.email = newUser.email
-    loginForm.password = newUser.password
-    currentMode.value = 'login'
-    registerSuccess.value = ''
-    registerForm.name = ''
-    registerForm.email = ''
-    registerForm.password = ''
-    registerForm.confirmPassword = ''
-  }, 1200)
-}
-
-// 3. จัดการ Forgot Password
-function handleForgotRequest() {
-  forgotError.value = ''
-  forgotSuccess.value = ''
-
-  if (!forgotForm.email.trim() || !forgotForm.email.includes('@')) {
-    forgotError.value = 'กรุณากรอกอีเมลให้ถูกต้อง'
-    return
-  }
-
-  const users = getRegisteredUsers()
-  const user = users.find(u => u.email.toLowerCase() === forgotForm.email.toLowerCase())
-
-  if (!user) {
-    forgotError.value = 'ไม่พบอีเมลนี้ในระบบ กรุณาตรวจสอบความถูกต้อง'
-    return
-  }
-
-  forgotStep.value = 2
-  forgotSuccess.value = `ยืนยันอีเมล ${user.email} ถูกต้อง กรุณาตั้งรหัสผ่านใหม่ด้านล่าง`
-}
-
-function handleResetPassword() {
-  forgotError.value = ''
-
-  if (forgotForm.newPassword.length < 6) {
-    forgotError.value = 'รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 6 ตัวอักษร'
-    return
-  }
-  if (forgotForm.newPassword !== forgotForm.confirmNewPassword) {
-    forgotError.value = 'รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน'
-    return
-  }
-
-  const users = getRegisteredUsers()
-  const user = users.find(u => u.email.toLowerCase() === forgotForm.email.toLowerCase())
-  if (user) {
-    user.password = forgotForm.newPassword
-    saveRegisteredUsers(users)
-  }
-
-  forgotSuccess.value = 'รีเซ็ตรหัสผ่านสำเร็จเรียบร้อย! สามารถใช้รหัสผ่านใหม่เข้าสู่ระบบได้เลย'
-  setTimeout(() => {
-    loginForm.email = forgotForm.email
-    loginForm.password = forgotForm.newPassword
-    currentMode.value = 'login'
-    forgotStep.value = 1
-    forgotForm.email = ''
-    forgotForm.newPassword = ''
-    forgotForm.confirmNewPassword = ''
-    forgotSuccess.value = ''
-  }, 1400)
-}
-
 function switchMode(mode) {
+  if (busy.value) return
   currentMode.value = mode
-  loginError.value = ''
-  registerError.value = ''
-  forgotError.value = ''
-  forgotStep.value = 1
+  error.value = ''; success.value = ''; recoveryCode.value = ''; pendingLogin.value = null
+  forgotStep.value = 1; forgotForm.code = ''; forgotForm.newPassword = ''; forgotForm.confirmNewPassword = ''
+  loginForm.password = ''; registerForm.password = ''; registerForm.confirmPassword = ''
+  showPassword.value = false
 }
+function finishLogin(user) {
+  saveSession(user, loginForm.rememberMe)
+  loginForm.password = ''
+  emit('login-success', user)
+}
+async function handleLogin() {
+  await run(async () => {
+    const result = await loginAccount(loginForm.email, loginForm.password)
+    if (result.recoveryCode) {
+      recoveryCode.value = result.recoveryCode
+      pendingLogin.value = result.user
+      success.value = 'ปรับปรุงบัญชีเดิมแล้ว กรุณาเก็บรหัสกู้คืนก่อนเข้าใช้งาน'
+    } else finishLogin(result.user)
+  })
+}
+async function continueLogin() { await run(() => finishLogin(pendingLogin.value)) }
+async function handleRegister() {
+  await run(async () => {
+    const result = await registerAccount(registerForm)
+    recoveryCode.value = result.recoveryCode
+    success.value = 'สมัครสมาชิกสำเร็จ กรุณาจดรหัสกู้คืน แล้วกดไปหน้าเข้าสู่ระบบ'
+    loginForm.email = result.user.email
+    registerForm.password = ''; registerForm.confirmPassword = ''
+  })
+}
+async function handleForgotRequest() {
+  await run(async () => { await verifyRecovery(forgotForm.email, forgotForm.code); forgotStep.value = 2 })
+}
+async function handleResetPassword() {
+  await run(async () => {
+    const result = await resetPassword(forgotForm.email, forgotForm.code, forgotForm.newPassword, forgotForm.confirmNewPassword)
+    recoveryCode.value = result.recoveryCode
+    success.value = 'ตั้งรหัสผ่านใหม่สำเร็จ รหัสกู้คืนเดิมใช้ไม่ได้แล้ว กรุณาจดรหัสใหม่'
+    loginForm.email = forgotForm.email
+    forgotForm.code = ''; forgotForm.newPassword = ''; forgotForm.confirmNewPassword = ''
+  })
+}
+function fillDemoAccount() { loginForm.email = 'student@example.com'; loginForm.password = 'password123'; error.value = '' }
 </script>
 
 <template>
   <div class="auth-card">
     <div class="student-badge">Student 2 Assignment</div>
-
-    <!-- กรณีผู้ใช้เข้าสู่ระบบแล้ว (Logged In Profile) -->
+    <p class="demo-note">ระบบสมาชิกจำลองสำหรับ Lab บัญชีและงานอยู่ในเบราว์เซอร์เครื่องนี้ ไม่มีการส่งอีเมลกู้รหัสผ่าน</p>
     <div v-if="currentUser" class="profile-box">
       <div class="avatar-circle">👤</div>
       <h3 class="user-name">{{ currentUser.name }}</h3>
       <p class="user-email">{{ currentUser.email }}</p>
-      <div class="login-status-badge">🟢 เข้าสู่ระบบแล้ว</div>
-
-      <button class="btn btn-logout" @click="emit('logout')">
-        🚪 ออกจากระบบ (Logout)
-      </button>
+      <button class="btn btn-logout" @click="emit('logout')">ออกจากระบบ (Logout)</button>
     </div>
-
-    <!-- กรณียังไม่เข้าสู่ระบบ (Tabs & Forms) -->
     <div v-else>
-      <!-- Navigation Tabs -->
-      <div class="auth-tabs">
-        <button
-          class="tab-btn"
-          :class="{ active: currentMode === 'login' }"
-          @click="switchMode('login')"
-        >
-          🔐 เข้าสู่ระบบ (Login)
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: currentMode === 'register' }"
-          @click="switchMode('register')"
-        >
-          📝 สมัครสมาชิก (Register)
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: currentMode === 'forgot' }"
-          @click="switchMode('forgot')"
-        >
-          🔑 ลืมรหัสผ่าน (Forgot)
-        </button>
+      <div class="auth-tabs" aria-label="เมนูบัญชี">
+        <button v-for="item in [{key:'login',label:'เข้าสู่ระบบ'}, {key:'register',label:'สมัครสมาชิก'}, {key:'forgot',label:'ลืมรหัสผ่าน'}]"
+          :key="item.key" class="tab-btn" :class="{active: currentMode === item.key}" :disabled="busy"
+          @click="switchMode(item.key)">{{ item.label }}</button>
       </div>
-
-      <!-- 1. หน้า LOGIN -->
-      <div v-if="currentMode === 'login'" class="form-container">
+      <div v-if="error" class="alert alert-danger" role="alert">{{ error }}</div>
+      <div v-if="success" class="alert alert-success" role="status">{{ success }}</div>
+      <div v-if="recoveryCode" class="recovery-box">
+        <strong>รหัสกู้คืนบัญชี — เก็บไว้ใช้เมื่อลืมรหัสผ่าน</strong>
+        <code data-testid="recovery-code">{{ recoveryCode }}</code>
+        <p>ใช้รหัสนี้คู่กับอีเมลในการตั้งรหัสผ่านใหม่</p>
+        <button v-if="pendingLogin" class="btn btn-primary btn-block" :disabled="busy" @click="continueLogin">เก็บรหัสแล้ว เข้าใช้งาน</button>
+        <button v-else class="btn btn-primary btn-block" @click="switchMode('login')">เก็บรหัสแล้ว ไปหน้าเข้าสู่ระบบ</button>
+      </div>
+      <div v-else-if="currentMode === 'login'" class="form-container">
         <h2 class="form-title">เข้าสู่ระบบ (Login)</h2>
-        <p class="form-desc">กรอกข้อมูลบัญชีเพื่อเข้าใช้งานระบบ</p>
-
-        <div v-if="loginError" class="alert alert-danger">{{ loginError }}</div>
-        <div v-if="loginSuccess" class="alert alert-success">{{ loginSuccess }}</div>
-
-        <form @submit.prevent="handleLogin" class="auth-form">
-          <div class="form-group">
-            <label>อีเมล (Email)</label>
-            <input
-              v-model="loginForm.email"
-              type="email"
-              placeholder="เช่น student@example.com"
-              required
-            />
+        <form class="auth-form" @submit.prevent="handleLogin">
+          <div class="form-group"><label for="login-email">อีเมล</label><input id="login-email" v-model="loginForm.email" type="email" autocomplete="username" required /></div>
+          <div class="form-group"><label for="login-password">รหัสผ่าน</label>
+            <div class="password-input-wrapper"><input id="login-password" v-model="loginForm.password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" required />
+              <button class="btn-toggle-pw" type="button" :aria-label="showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'" @click="showPassword = !showPassword">{{ showPassword ? '🙈' : '👁️' }}</button></div>
           </div>
-
-          <div class="form-group">
-            <label>รหัสผ่าน (Password)</label>
-            <div class="password-input-wrapper">
-              <input
-                v-model="loginForm.password"
-                :type="showPassword ? 'text' : 'password'"
-                placeholder="กรอกรหัสผ่านของคุณ"
-                required
-              />
-              <button
-                type="button"
-                class="btn-toggle-pw"
-                @click="showPassword = !showPassword"
-              >
-                {{ showPassword ? '🙈' : '👁️' }}
-              </button>
-            </div>
-          </div>
-
-          <div class="form-options">
-            <label class="remember-me">
-              <input type="checkbox" v-model="loginForm.rememberMe" />
-              <span>จดจำการเข้าสู่ระบบ</span>
-            </label>
-            <a href="#" class="link-forgot" @click.prevent="switchMode('forgot')">
-              ลืมรหัสผ่าน?
-            </a>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block">
-            เข้าสู่ระบบ (Login)
-          </button>
-
-          <button
-            type="button"
-            class="btn btn-demo btn-block"
-            @click="fillDemoAccount"
-          >
-            ⚡ บัญชีทดสอบ (Demo: student@example.com)
-          </button>
+          <label class="remember-me"><input v-model="loginForm.rememberMe" type="checkbox" /><span>จดจำการเข้าสู่ระบบ</span></label>
+          <button class="btn btn-primary btn-block" :disabled="busy" type="submit">{{ busy ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ (Login)' }}</button>
+          <button class="btn btn-demo btn-block" :disabled="busy" type="button" @click="fillDemoAccount">ใช้บัญชีทดสอบ student@example.com</button>
         </form>
-
-        <p class="switch-prompt">
-          ยังไม่มีบัญชีใช่หรือไม่?
-          <a href="#" @click.prevent="switchMode('register')">สมัครสมาชิกที่นี่</a>
-        </p>
+        <p class="demo-note">บัญชีทดสอบ: password123 · รหัสกู้คืนเริ่มต้น: {{ DEMO_RECOVERY_CODE }}</p>
       </div>
-
-      <!-- 2. หน้า REGISTER -->
       <div v-else-if="currentMode === 'register'" class="form-container">
         <h2 class="form-title">สมัครสมาชิก (Register)</h2>
-        <p class="form-desc">สร้างบัญชีผู้ใช้งานใหม่เพื่อเข้าสู่ระบบ</p>
-
-        <div v-if="registerError" class="alert alert-danger">{{ registerError }}</div>
-        <div v-if="registerSuccess" class="alert alert-success">{{ registerSuccess }}</div>
-
-        <form @submit.prevent="handleRegister" class="auth-form">
-          <div class="form-group">
-            <label>ชื่อ-นามสกุล (Full Name)</label>
-            <input
-              v-model="registerForm.name"
-              type="text"
-              placeholder="เช่น นายสมชาย ใจดี"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>อีเมล (Email)</label>
-            <input
-              v-model="registerForm.email"
-              type="email"
-              placeholder="เช่น somchai@example.com"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>รหัสผ่าน (Password, ขั้นต่ำ 6 ตัวอักษร)</label>
-            <input
-              v-model="registerForm.password"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="กำหนดรหัสผ่าน"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>ยืนยันรหัสผ่าน (Confirm Password)</label>
-            <input
-              v-model="registerForm.confirmPassword"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="กรอกรหัสผ่านอีกครั้ง"
-              required
-            />
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block">
-            ยืนยันสมัครสมาชิก (Register)
-          </button>
+        <form class="auth-form" @submit.prevent="handleRegister">
+          <div class="form-group"><label for="register-name">ชื่อ-นามสกุล</label><input id="register-name" v-model="registerForm.name" autocomplete="name" required /></div>
+          <div class="form-group"><label for="register-email">อีเมล</label><input id="register-email" v-model="registerForm.email" type="email" autocomplete="email" required /></div>
+          <div class="form-group"><label for="register-password">รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)</label><input id="register-password" v-model="registerForm.password" type="password" autocomplete="new-password" minlength="6" required /></div>
+          <div class="form-group"><label for="register-confirm">ยืนยันรหัสผ่าน</label><input id="register-confirm" v-model="registerForm.confirmPassword" type="password" autocomplete="new-password" required /></div>
+          <button class="btn btn-primary btn-block" :disabled="busy" type="submit">{{ busy ? 'กำลังบันทึก...' : 'ยืนยันสมัครสมาชิก (Register)' }}</button>
         </form>
-
-        <p class="switch-prompt">
-          มีบัญชีอยู่แล้ว?
-          <a href="#" @click.prevent="switchMode('login')">เข้าสู่ระบบที่นี่</a>
-        </p>
       </div>
-
-      <!-- 3. หน้า FORGOT PASSWORD -->
-      <div v-else-if="currentMode === 'forgot'" class="form-container">
+      <div v-else class="form-container">
         <h2 class="form-title">ลืมรหัสผ่าน (Forgot Password)</h2>
-        <p class="form-desc">ระบุอีเมลที่ลงทะเบียนไว้เพื่อตั้งรหัสผ่านใหม่</p>
-
-        <div v-if="forgotError" class="alert alert-danger">{{ forgotError }}</div>
-        <div v-if="forgotSuccess" class="alert alert-success">{{ forgotSuccess }}</div>
-
-        <!-- ขั้นที่ 1: ตรวจสอบอีเมล -->
-        <form v-if="forgotStep === 1" @submit.prevent="handleForgotRequest" class="auth-form">
-          <div class="form-group">
-            <label>อีเมลที่ลงทะเบียน (Registered Email)</label>
-            <input
-              v-model="forgotForm.email"
-              type="email"
-              placeholder="เช่น student@example.com"
-              required
-            />
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block">
-            ตรวจสอบอีเมลเพื่อรีเซ็ต
-          </button>
+        <form v-if="forgotStep === 1" class="auth-form" @submit.prevent="handleForgotRequest">
+          <div class="form-group"><label for="forgot-email">อีเมลที่ลงทะเบียน</label><input id="forgot-email" v-model="forgotForm.email" type="email" required /></div>
+          <div class="form-group"><label for="forgot-code">รหัสกู้คืนที่ได้รับตอนสมัครสมาชิก</label><input id="forgot-code" v-model="forgotForm.code" autocomplete="off" required /></div>
+          <button class="btn btn-primary btn-block" :disabled="busy" type="submit">ตรวจสอบรหัสกู้คืน</button>
         </form>
-
-        <!-- ขั้นที่ 2: ตั้งรหัสผ่านใหม่ -->
-        <form v-else-if="forgotStep === 2" @submit.prevent="handleResetPassword" class="auth-form">
-          <div class="form-group">
-            <label>รหัสผ่านใหม่ (New Password)</label>
-            <input
-              v-model="forgotForm.newPassword"
-              type="password"
-              placeholder="กรอกรหัสผ่านใหม่"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>ยืนยันรหัสผ่านใหม่ (Confirm New Password)</label>
-            <input
-              v-model="forgotForm.confirmNewPassword"
-              type="password"
-              placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
-              required
-            />
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-block">
-            💾 บันทึกรหัสผ่านใหม่
-          </button>
+        <form v-else class="auth-form" @submit.prevent="handleResetPassword">
+          <div class="form-group"><label for="reset-password">รหัสผ่านใหม่</label><input id="reset-password" v-model="forgotForm.newPassword" type="password" autocomplete="new-password" minlength="6" required /></div>
+          <div class="form-group"><label for="reset-confirm">ยืนยันรหัสผ่านใหม่</label><input id="reset-confirm" v-model="forgotForm.confirmNewPassword" type="password" autocomplete="new-password" required /></div>
+          <button class="btn btn-primary btn-block" :disabled="busy" type="submit">บันทึกรหัสผ่านใหม่</button>
         </form>
-
-        <p class="switch-prompt">
-          <a href="#" @click.prevent="switchMode('login')">← กลับไปยังหน้าเข้าสู่ระบบ</a>
-        </p>
       </div>
     </div>
   </div>
 </template>
-
 <style scoped>
+.demo-note { color: #64748b; background: #f8fafc; padding: 12px; margin-bottom: 16px; border-radius: 8px; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.recovery-box { padding: 16px; border: 1px solid #bfdbfe; border-radius: 12px; background: #eff6ff; line-height: 1.8; }
+.recovery-box code { display: block; margin: 12px 0; font-size: 16px; user-select: all; overflow-wrap: anywhere; }
+button:disabled { opacity: .6; cursor: wait; }
+
 .auth-card {
   background: #ffffff;
   border-radius: 16px;
@@ -638,7 +342,7 @@ function switchMode(mode) {
 
 .btn-primary {
   background-color: var(--primary-color, #2563eb);
-  color: #ffffff;
+  color: var(--primary-contrast, #ffffff);
 }
 
 .btn-primary:hover {
