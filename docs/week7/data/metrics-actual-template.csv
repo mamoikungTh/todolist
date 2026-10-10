@@ -1,0 +1,13 @@
+﻿sprint,id,item,points,status,request_date,start_date,done_date,sprint_end_date,owner,blocker,evidence,data_type
+Todo,TD-01,Todo CRUD และ Complete,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Todo,TD-02,บันทึกและแยกข้อมูลบัญชี,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Todo,TD-03,สมัคร/เข้า/ออกระบบจำลอง,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Todo,TD-04,กู้รหัสผ่านและ session,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Todo,TD-05,ธีม/ฟอนต์/ขนาด/รีเซ็ต,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Todo,TD-06,ค้นหาและกรองสถานะ,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Todo,TD-07,เรียงลำดับและล้างงานจบ,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Study,SP-01,วิชาและวันสอบ,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Study,SP-02,CRUD รอบอ่านหนังสือ,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Study,SP-03,อ่านจบและสรุปเวลา,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Study,SP-04,ค้นหา/กรอง/เรียงวันที่,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING
+Study,SP-05,บันทึกข้อมูลใน browser,,Unknown,,,,,,,,ACTUAL_INPUT_PENDING

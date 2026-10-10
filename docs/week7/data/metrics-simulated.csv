@@ -1,0 +1,13 @@
+﻿sprint,id,item,points,owner,request,start,done,sprint_end,status,blocker,data_type,lead,cycle,wait
+Todo,TD-01,Todo CRUD และ Complete,3,S1,0,0,1,5,Done,ไม่มีในตัวอย่าง,SIMULATED,1,1,0
+Todo,TD-02,บันทึกและแยกข้อมูลบัญชี,3,S1,0,1,3,5,Done,สมมติ: รอเชื่อม storage กับบัญชี,SIMULATED,3,2,1
+Todo,TD-03,สมัคร/เข้า/ออกระบบจำลอง,5,S2,0,1,3,5,Done,สมมติ: รอทดสอบร่วมกับ Todo,SIMULATED,3,2,1
+Todo,TD-04,กู้รหัสผ่านและ session,5,S2,0,2,4,5,Done,ไม่มีในตัวอย่าง,SIMULATED,4,2,2
+Todo,TD-05,ธีม/ฟอนต์/ขนาด/รีเซ็ต,3,S3,1,3,4,5,Done,สมมติ: รอเริ่มตามลำดับงาน,SIMULATED,3,1,2
+Todo,TD-06,ค้นหาและกรองสถานะ,3,S4,0,3,5,5,Done,สมมติ: รอข้อมูลทดสอบหลายสถานะ,SIMULATED,5,2,3
+Todo,TD-07,เรียงลำดับและล้างงานจบ,2,S4,1,4,5,5,Done,สมมติ: เริ่มช่วงท้าย Sprint,SIMULATED,4,1,3
+Study,SP-01,วิชาและวันสอบ,3,S1,0,0,1,5,Done,ไม่มีในตัวอย่าง,SIMULATED,1,1,0
+Study,SP-02,CRUD รอบอ่านหนังสือ,5,S2,0,1,3,5,Done,สมมติ: ตรวจวันที่สัมพันธ์กับวิชา,SIMULATED,3,2,1
+Study,SP-03,อ่านจบและสรุปเวลา,2,S3,0,2,4,5,Done,ไม่มีในตัวอย่าง,SIMULATED,4,2,2
+Study,SP-04,ค้นหา/กรอง/เรียงวันที่,2,S3,1,3,4,5,Done,สมมติ: รอเริ่มหลังสรุปข้อมูล,SIMULATED,3,1,2
+Study,SP-05,บันทึกข้อมูลใน browser,3,S4,0,2,5,5,Done,สมมติ: ตรวจ storage เสีย/ถูกบล็อก,SIMULATED,5,3,2
