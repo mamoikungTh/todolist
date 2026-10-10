@@ -1,0 +1,20 @@
+[
+  {
+    "sprint": "Todo",
+    "items": 7,
+    "velocity": 24,
+    "not_done_points": 0,
+    "lead": 3.2857142857142856,
+    "cycle": 1.5714285714285714,
+    "wait": 1.7142857142857142
+  },
+  {
+    "sprint": "Study",
+    "items": 5,
+    "velocity": 15,
+    "not_done_points": 0,
+    "lead": 3.2,
+    "cycle": 1.8,
+    "wait": 1.4
+  }
+]

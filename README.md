@@ -2,6 +2,10 @@
 
 พัฒนาต่อจากโปรเจกต์เดิมด้วย Vue 3 + Vite ใช้สำหรับฝึก Feature Branch, AI Plan, Unit Test และ Manual Test
 
+## ชุดงาน Week 7
+
+ดู **[Lab 7-1 ถึง 7-4](docs/week7/README.md)** ใน branch `lab7`: ตาราง Metrics 12 รายการ, กราฟ Velocity, Lead/Cycle Time, Refined Backlog และไฟล์ Excel พร้อมสูตร มีข้อมูลตัวอย่างแยกจากช่องกรอกผลจริง และบทวิดีโอรวม 5–8 นาทีตามโจทย์
+
 ## ชุดงาน Week 6
 
 ดู **[Lab 6-1 ถึง 6-4](docs/week6/README.md)** ใน branch `lab6`: เอกสาร Backlog/Burndown/Review/Retro, บทพูดทีม 4 คน, แบบบันทึกหลักฐานจริง และต้นแบบ **Study Planner** ที่ `/study-planner/` หลังรัน `npm run dev`
