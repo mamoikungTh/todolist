@@ -1,4 +1,4 @@
-# Todo List — Lab 5-3 (ทีม 4 คน)
+# Todo List (ทีม 4 คน)
 
 พัฒนาต่อจากโปรเจกต์เดิมด้วย Vue 3 + Vite ใช้สำหรับฝึก Feature Branch, AI Plan, Unit Test และ Manual Test
 
