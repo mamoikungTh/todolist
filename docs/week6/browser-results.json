@@ -1,0 +1,20 @@
+{
+  "runner": "Chromium + Playwright",
+  "checks": [
+    "create subjects and sessions; reject duplicate subjects",
+    "edit, complete, summarize, and persist across refresh",
+    "combined filters, search, empty state and clearing",
+    "protect existing sessions from conflicting exam edits and subject deletion",
+    "Thai font and responsive 390px / 320px without horizontal overflow",
+    "delete confirmation respects cancel and accept",
+    "corrupted storage stays untouched until explicit replacement confirmation",
+    "failed storage writes remain usable and show a persistent warning"
+  ],
+  "jsErrors": [],
+  "viewportWidths": [
+    1440,
+    390,
+    320
+  ],
+  "note": "Automated checks; not student manual testing. Screenshots use demonstration data."
+}

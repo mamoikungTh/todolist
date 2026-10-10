@@ -2,6 +2,12 @@
 
 พัฒนาต่อจากโปรเจกต์เดิมด้วย Vue 3 + Vite ใช้สำหรับฝึก Feature Branch, AI Plan, Unit Test และ Manual Test
 
+## ชุดงาน Week 6
+
+ดู **[Lab 6-1 ถึง 6-4](docs/week6/README.md)** ใน branch `lab6`: เอกสาร Backlog/Burndown/Review/Retro, บทพูดทีม 4 คน, แบบบันทึกหลักฐานจริง และต้นแบบ **Study Planner** ที่ `/study-planner/` หลังรัน `npm run dev`
+
+ข้อมูลรายวันและ Feedback ตัวอย่างมีป้ายกำกับว่าเป็นการจำลอง ทีมต้องเก็บผลจริงและอัดวิดีโอตามโจทย์ก่อนส่ง
+
 ## เปิดงานที่พัฒนาเสร็จสำหรับตรวจ
 
 ชุดรวมสำหรับทดสอบอยู่ที่ **[`feature4.1`](https://github.com/mamoikungTh/todolist/tree/feature4.1)** บน GitHub แล้ว รวมงานของทั้ง 4 ส่วน พร้อม tests และเอกสาร ส่วน `dev` เป็นฐานสำหรับรับงานหลังผ่าน Manual Test และ Peer Review ตาม Lab 5-3
