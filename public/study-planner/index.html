@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#163e37">
+  <title>Study Planner — วางแผนอ่านหนังสือ</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">ข้ามไปเนื้อหา</a>
+<header class="topbar"><a class="brand" href="./"><span class="brand-icon">S</span> Study Planner</a><span class="tag">LAB 6-4 · PROTOTYPE</span><a href="/">กลับ Todo List</a></header>
+<main id="main">
+  <section class="hero"><div><p class="eyebrow">SMALL STEPS. CLEAR MIND.</p><h1>อ่านทีละนิด<br><span>พร้อมก่อนวันสอบ</span></h1><p>จัดวิชา วางรอบอ่าน และติดตามสิ่งที่อ่านจบแล้ว<br>ให้เห็นแผนของคุณในหน้าเดียว</p></div><div class="hero-card"><span class="overline">YOUR STUDY SPACE</span><div class="book-art" aria-hidden="true"><i></i><i></i><i></i></div><strong>แผนที่ดี เริ่มจากหนึ่งรอบอ่าน</strong><span>เลือกหัวข้อเล็ก ๆ แล้วค่อยไปต่อ</span></div></section>
+  <div id="message" role="status" aria-live="polite"></div>
+  <div id="storage-warning" role="alert" hidden></div>
+  <section class="stats" aria-label="สรุปแผนอ่าน"><article><span>วิชาที่เตรียมสอบ</span><strong id="subject-count">0</strong></article><article><span>รอบที่อ่านจบ / ทั้งหมด</span><strong id="done-count">0 / 0</strong></article><article><span>เวลาอ่านที่วางแผน</span><strong id="planned-time">0 <small>นาที</small></strong></article><article><span>เวลาของรอบที่อ่านจบ</span><strong id="completed-time">0 <small>นาที</small></strong></article></section>
+  <div class="workspace">
+    <aside>
+      <section class="panel"><div class="section-heading"><h2>วิชาของฉัน</h2><span class="step">01</span></div><p class="muted">เพิ่มวิชาและวันสอบก่อนวางรอบอ่าน</p>
+      <form id="subject-form"><label for="subject-name">ชื่อวิชา</label><input id="subject-name" name="name" maxlength="60" required placeholder="เช่น Software Testing"><label for="exam-date">วันสอบ</label><input id="exam-date" name="examDate" type="date" required><button class="primary" type="submit" id="subject-submit">เพิ่มวิชา</button><button type="button" id="subject-cancel" hidden>ยกเลิกแก้ไขวิชา</button></form>
+      <ul id="subject-list" class="subject-list"></ul></section>
+      <section class="note"><strong>น้อยแต่สม่ำเสมอ</strong><p>แบ่งหัวข้อให้พออ่านจบในหนึ่งรอบ แล้วติ๊กเมื่ออ่านจบจริง</p><span>ข้อมูลบันทึกเฉพาะ browser นี้<br>ไม่มีการแจ้งเตือนหรือ sync ข้ามเครื่อง</span></section>
+    </aside>
+    <div class="main-column">
+      <section class="panel"><div class="section-heading"><h2>วางรอบอ่านหนังสือ</h2><span class="step">02</span></div><p class="muted" id="session-hint">เริ่มจากเพิ่มวิชาทางซ้าย</p>
+      <form id="session-form"><div class="form-grid"><div><label for="session-subject">วิชา</label><select id="session-subject" name="subjectId" required></select></div><div><label for="session-topic">หัวข้ออ่าน</label><input id="session-topic" name="topic" required maxlength="120" placeholder="เช่น BVA และรอยต่อขอบเขต"></div><div><label for="session-date">วันที่อ่าน</label><input id="session-date" name="date" type="date" required></div><div><label for="session-minutes">เวลาอ่าน (นาที)</label><input id="session-minutes" name="minutes" type="number" min="5" max="480" step="1" value="30" required></div></div><div class="form-actions"><button type="submit" class="primary" id="session-submit">เพิ่มรอบอ่าน</button><button type="button" id="session-cancel" hidden>ยกเลิกแก้ไขรอบอ่าน</button></div></form></section>
+      <section class="panel"><div class="section-heading"><h2>แผนอ่านของฉัน</h2><span id="visible-count" class="tag">0 รอบ</span></div><div class="filters"><div><label for="filter-search">ค้นหาหัวข้อหรือวิชา</label><input type="search" id="filter-search" placeholder="พิมพ์คำที่ต้องการค้นหา"></div><div><label for="filter-subject">กรองวิชา</label><select id="filter-subject"></select></div><div><label for="filter-status">สถานะ</label><select id="filter-status"><option value="all">ทั้งหมด</option><option value="pending">ยังไม่อ่านจบ</option><option value="done">อ่านจบแล้ว</option></select></div></div><div class="list-caption"><span>เรียงจากวันที่อ่านใกล้ที่สุด</span><button type="button" id="clear-filters" class="text-button">ล้างตัวกรอง</button></div><ul id="session-list" class="session-list"></ul><div id="empty" class="empty"><span class="empty-icon" aria-hidden="true">✓</span><h3>เริ่มต้นด้วยรอบอ่านแรก</h3><p>เพิ่มวิชา แล้วเลือกหัวข้อที่อยากอ่านวันนี้</p></div></section>
+    </div>
+  </div>
+</main><footer>Study Planner · Agile Software Development / Week 6 <span>ข้อมูลเวลาเป็นเวลาที่วางแผน ไม่ใช่ตัวจับเวลา</span></footer>
+</body></html>
